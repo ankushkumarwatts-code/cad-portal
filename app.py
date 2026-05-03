@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, session
-import sqlite3
+import psycopg2
 import datetime
 import os
 
@@ -27,8 +27,7 @@ os.makedirs(STATIC_FOLDER, exist_ok=True)
 # DATABASE
 # =======================
 def get_db():
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row
+    conn = psycopg2.connect(os.environ.get("DATABASE_URL"))
     return conn
 
 # =======================
@@ -40,7 +39,7 @@ def create_users():
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         username TEXT,
         password TEXT,
         role TEXT
@@ -65,7 +64,7 @@ def create_complaints_table():
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS complaints (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         name TEXT,
         phone TEXT,
         issue TEXT,
