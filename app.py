@@ -159,7 +159,7 @@ def complaint():
         conn.commit()
         conn.close()
 
-        return redirect(url_for('dashboard'))
+        return "Complaint Submitted Successfully ✅"
 
     return render_template('complaint.html')
 
