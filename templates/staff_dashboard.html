@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CAD Staff Work Panel</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-4">
+
+    <!-- 🔥 🔥 TRIPLE LOGO HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div style="width:25%; text-align:left;">
+            <img src="{{ url_for('static', filename='left_logo.png') }}" style="height:80px;">
+        </div>
+
+        <div style="width:50%; text-align:center;">
+            <img src="{{ url_for('static', filename='logo.png') }}" style="height:90px;">
+        </div>
+
+        <div style="width:25%; text-align:right;">
+            <img src="{{ url_for('static', filename='right_logo.png') }}" style="height:80px;">
+        </div>
+
+    </div>
+
+    <!-- 🔹 Heading -->
+    <h2 class="text-center">Baba Farid Group Of Institutions</h2>
+    <h4 class="text-center text-muted mb-3">CAD Staff Work Panel</h4>
+
+    <!-- 🔥 Info -->
+    <div class="alert alert-info text-center">
+        All assigned complaints are visible here
+    </div>
+
+    <!-- 🔥 TABLE -->
+    <table class="table table-bordered table-striped text-center align-middle">
+
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Student</th>
+                <th>Phone</th>
+                <th>Issue</th>
+                <th>Deadline</th>
+                <th>Received</th>
+                <th>Status</th>
+                <th style="width:220px;">Progress</th>
+                <th>Update Status</th>
+                <th>Proof</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for row in data %}
+        <tr>
+
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] }}</td>
+            <td>{{ row[3] }}</td>
+
+            <!-- 🔥 DEADLINE -->
+            <td>
+                {% if row[11] != "-" %}
+                    <span class="badge bg-danger">{{ row[11] }}</span>
+                {% else %}
+                    <span class="text-muted">Not Set</span>
+                {% endif %}
+            </td>
+
+            <!-- 🔥 RECEIVE -->
+            <td>
+                {% if row[8] == "No" %}
+                    <form action="/receive/{{ row[0] }}" method="POST">
+                        <button class="btn btn-warning btn-sm w-100">Receive</button>
+                    </form>
+                {% else %}
+                    <span class="badge bg-success">Received</span>
+                {% endif %}
+            </td>
+
+            <!-- 🔹 STATUS -->
+            <td>
+                {% if row[5] == "Pending" %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                {% elif row[5] == "In Progress" %}
+                    <span class="badge bg-primary">In Progress</span>
+                {% elif row[5] == "Completed" %}
+                    <span class="badge bg-success">Completed</span>
+                {% endif %}
+            </td>
+
+            <!-- 🔥 PROGRESS BAR -->
+            <td>
+                <div class="progress mb-2">
+                    <div class="progress-bar 
+                        {% if row[12] < 40 %}
+                            bg-danger
+                        {% elif row[12] < 80 %}
+                            bg-warning
+                        {% else %}
+                            bg-success
+                        {% endif %}"
+                        style="width: {{ row[12] }}%;">
+                        {{ row[12] }}%
+                    </div>
+                </div>
+
+                <!-- UPDATE PROGRESS -->
+                <form action="/progress/{{ row[0] }}" method="POST">
+                    <input type="number" name="progress" min="0" max="100"
+                           class="form-control mb-1" placeholder="Update %" required>
+                    <button class="btn btn-sm btn-primary w-100">Update</button>
+                </form>
+            </td>
+
+            <!-- STATUS UPDATE -->
+            <td>
+                <form action="/status/{{ row[0] }}" method="POST">
+                    <select name="status" class="form-control mb-1">
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                    <button class="btn btn-sm btn-dark w-100">Update</button>
+                </form>
+            </td>
+
+            <!-- FILE -->
+            <td>
+                {% if row[7] %}
+                    <a href="/uploads/{{ row[7] }}" target="_blank"
+                       class="btn btn-success btn-sm w-100">View</a>
+                {% else %}
+                    <form action="/upload/{{ row[0] }}" method="POST" enctype="multipart/form-data">
+                        <input type="file" name="document" class="form-control mb-1" required>
+                        <button class="btn btn-dark btn-sm w-100">Upload</button>
+                    </form>
+                {% endif %}
+            </td>
+
+        </tr>
+        {% endfor %}
+        </tbody>
+
+    </table>
+
+</div>
+
+</body>
+</html>

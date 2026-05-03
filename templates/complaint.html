@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Submit Complaint</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+
+        .form-box {
+            background: white;
+            border: 2px solid #333;
+            padding: 25px;
+            width: 380px;
+            margin: 50px auto;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+        }
+
+        input, textarea {
+            width: 95%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        textarea {
+            height: 80px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        h2 {
+            margin-bottom: 5px;
+        }
+
+        h3 {
+            margin-top: 0;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="form-box">
+
+    <h2>Baba Farid Group of Institutions</h2>
+    <h3>CAD Department - Submit Complaint</h3>
+
+    
+    <form method="POST" enctype="multipart/form-data">
+
+        <label>Name:</label><br>
+        <input type="text" name="name" required><br><br>
+
+        <label>Phone Number:</label><br>
+        <input type="text" name="phone" required><br><br>
+
+        <label>Issue:</label><br>
+        <input type="text" name="issue" required><br><br>
+
+        <label>Description:</label><br>
+        <textarea name="description" required></textarea><br><br>
+
+        <label>Upload Document (Fee Slip / Proof):</label><br>
+        <input type="file" name="document"><br><br>
+
+        <button type="submit">Submit Complaint</button>
+
+    </form>
+
+    <br>
+    <a href="/dashboard">⬅ Back to Dashboard</a>
+
+</div>
+
+</body>
+</html>
