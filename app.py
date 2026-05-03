@@ -23,13 +23,13 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(STATIC_FOLDER, exist_ok=True)
 
-
 # =======================
 # DATABASE
 # =======================
 def get_db():
-    return sqlite3.connect('database.db')
-
+    conn = sqlite3.connect('database.db')
+    conn.row_factory = sqlite3.Row
+    return conn
 
 # =======================
 # USERS TABLE
@@ -47,16 +47,14 @@ def create_users():
     )
     """)
 
-    cursor.execute("SELECT * FROM users WHERE username='admin'")
-    if not cursor.fetchone():
-        cursor.execute("INSERT INTO users VALUES (NULL,'admin','1234','admin')")
+    # 🔥 RESET USERS (Deploy safe)
+    cursor.execute("DELETE FROM users")
 
-    cursor.execute("SELECT * FROM users WHERE username='staff'")
-    if not cursor.fetchone():
-        cursor.execute("INSERT INTO users VALUES (NULL,'staff','welcome1','staff')")
+    cursor.execute("INSERT INTO users VALUES (NULL,'admin','1234','admin')")
+    cursor.execute("INSERT INTO users VALUES (NULL,'staff','welcome1','staff')")
+
     conn.commit()
     conn.close()
-
 
 # =======================
 # COMPLAINT TABLE
@@ -86,13 +84,12 @@ def create_complaints_table():
     conn.commit()
     conn.close()
 
-
+# 🔥 INIT
 create_users()
 create_complaints_table()
 
-
 # =======================
-# LOGIN
+# LOGIN (FIXED)
 # =======================
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -102,22 +99,23 @@ def login():
 
         conn = get_db()
         cursor = conn.cursor()
+
         cursor.execute("SELECT role FROM users WHERE username=? AND password=?", (u, p))
         user = cursor.fetchone()
+
         conn.close()
 
         if user:
-           session['user'] = u
+            session['user'] = u
 
-           if user[0] == "admin":
-              return redirect(url_for('dashboard'))
-        else:
-              return redirect(url_for('staff_dashboard'))
+            if user['role'] == "admin":
+                return redirect(url_for('dashboard'))
+            else:
+                return redirect(url_for('staff_dashboard'))
 
         return "Invalid Login ❌"
 
     return render_template('login.html')
-
 
 # =======================
 # LOGOUT
@@ -126,7 +124,6 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for('login'))
-
 
 # =======================
 # ADD COMPLAINT
@@ -166,7 +163,6 @@ def complaint():
 
     return render_template('complaint.html')
 
-
 # =======================
 # ADMIN DASHBOARD
 # =======================
@@ -199,7 +195,6 @@ def dashboard():
                            progress=progress,
                            completed=completed)
 
-
 # =======================
 # STAFF PANEL
 # =======================
@@ -214,7 +209,6 @@ def staff_dashboard():
     conn.close()
 
     return render_template('staff_dashboard.html', data=data)
-
 
 # =======================
 # ASSIGN
@@ -240,7 +234,6 @@ def assign(id):
 
     return redirect(url_for('dashboard'))
 
-
 # =======================
 # RECEIVE
 # =======================
@@ -262,7 +255,6 @@ def receive(id):
 
     return redirect(url_for('staff_dashboard'))
 
-
 # =======================
 # STATUS UPDATE
 # =======================
@@ -279,7 +271,6 @@ def update_status(id):
     conn.close()
 
     return redirect(url_for('staff_dashboard'))
-
 
 # =======================
 # PROGRESS UPDATE
@@ -308,7 +299,6 @@ def update_progress(id):
 
     return redirect(url_for('staff_dashboard'))
 
-
 # =======================
 # FILE UPLOAD
 # =======================
@@ -329,7 +319,6 @@ def upload_file(id):
         conn.close()
 
     return redirect(url_for('staff_dashboard'))
-
 
 # =======================
 # PERFORMANCE REPORT
@@ -367,9 +356,8 @@ def performance():
 
     return render_template('performance.html', data=result)
 
-
 # =======================
-# 🔥 FINAL PDF REPORT (PROFESSIONAL)
+# PDF REPORT
 # =======================
 @app.route('/download_report')
 def download_report():
@@ -398,24 +386,14 @@ def download_report():
 
     elements = []
 
-    # 🔥 LOGO
     logo_path = os.path.join('static', 'logo.png')
     if os.path.exists(logo_path):
         elements.append(Image(logo_path, width=150, height=60))
 
     elements.append(Spacer(1, 10))
-
     elements.append(Paragraph("Baba Farid Group of Institutions", styles['Title']))
     elements.append(Paragraph("CAD Complaint & Service Report", styles['Heading2']))
-
     elements.append(Spacer(1, 10))
-
-    if start and end:
-        elements.append(Paragraph(f"Report From: {start} To {end}", styles['Normal']))
-    else:
-        elements.append(Paragraph("Full Report", styles['Normal']))
-
-    elements.append(Spacer(1, 15))
 
     table_data = [["ID", "Name", "Phone", "Issue", "Status", "Assigned To", "Progress"]]
 
@@ -433,11 +411,9 @@ def download_report():
     ]))
 
     elements.append(table)
-
     doc.build(elements)
 
     return send_from_directory('.', file_path, as_attachment=True)
-
 
 # =======================
 # FILE VIEW
@@ -445,7 +421,6 @@ def download_report():
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
 
 # =======================
 # RUN
