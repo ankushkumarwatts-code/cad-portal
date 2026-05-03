@@ -51,6 +51,9 @@ def create_users():
     if not cursor.fetchone():
         cursor.execute("INSERT INTO users VALUES (NULL,'admin','1234','admin')")
 
+    cursor.execute("SELECT * FROM users WHERE username='staff'")
+    if not cursor.fetchone():
+        cursor.execute("INSERT INTO users VALUES (NULL,'staff','welcome1','staff')")
     conn.commit()
     conn.close()
 
@@ -104,8 +107,12 @@ def login():
         conn.close()
 
         if user:
-            session['user'] = u
-            return redirect(url_for('dashboard'))
+           session['user'] = u
+
+           if user[0] == "admin":
+              return redirect(url_for('dashboard'))
+        else:
+              return redirect(url_for('staff_dashboard'))
 
         return "Invalid Login ❌"
 
