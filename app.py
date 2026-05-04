@@ -27,7 +27,12 @@ os.makedirs(STATIC_FOLDER, exist_ok=True)
 # DATABASE
 # =======================
 def get_db():
-    conn = psycopg2.connect(os.environ.get("DATABASE_URL"))
+    url = os.environ.get("DATABASE_URL")
+
+    if url and url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
+
+    conn = psycopg2.connect(url)
     return conn
 
 # =======================
