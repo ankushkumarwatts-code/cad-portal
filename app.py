@@ -107,7 +107,7 @@ def login():
         if user:
             session['user'] = u
 
-            if user['role'] == "admin":
+            if user[0] == "admin":
                 return redirect(url_for('dashboard'))
             else:
                 return redirect(url_for('staff_dashboard'))
