@@ -148,7 +148,7 @@ def complaint():
         cursor.execute("""
         INSERT INTO complaints 
         (name, phone, issue, description, status, assigned_to, document, received, assigned_time, received_time, deadline, progress)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """, (
             name, phone, issue, description,
             "Pending", "Not Assigned", filename,
@@ -225,7 +225,7 @@ def assign(id):
     cursor.execute("""
     UPDATE complaints
     SET assigned_to=?, assigned_time=?, deadline=?
-    WHERE id=?
+    WHERE id=%s
     """, (staff, assign_time, deadline, id))
 
     conn.commit()
@@ -264,7 +264,7 @@ def update_status(id):
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute("UPDATE complaints SET status=? WHERE id=?", (status, id))
+    cursor.execute("UPDATE complaints SET status=%s WHERE id=%s", (status, id))
 
     conn.commit()
     conn.close()
