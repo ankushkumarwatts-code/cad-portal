@@ -99,7 +99,7 @@ def login():
         conn = get_db()
         cursor = conn.cursor()
 
-        cursor.execute("SELECT role FROM users WHERE username=? AND password=?", (u, p))
+       cursor.execute("SELECT role FROM users WHERE username=%s AND password=%s", (u, p))
         user = cursor.fetchone()
 
         conn.close()
